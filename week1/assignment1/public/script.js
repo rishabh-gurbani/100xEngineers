@@ -4,6 +4,7 @@ const messageInput = document.getElementById("message-input");
 const contactsList = document.querySelector(".contacts-list");
 const messagesDiv = document.querySelector(".messages");
 
+// username prompt
 let username;
 do{
     username = prompt("Please enter your username:");
@@ -11,6 +12,9 @@ do{
 
 socket.emit("user joined", username);
 
+// socket functions
+
+// new user entered chat
 socket.on("update userList", (users) => {
     contactsList.innerHTML = "";
 
@@ -28,17 +32,7 @@ socket.on("update userList", (users) => {
     });
 });
 
-function sendMessage(){
-    const message = messageInput.value;
-    console.log(message);
-    if(message.trim() !== ""){
-        socket.emit("chat message", message);
-        messageInput.value = "";
-    }
-};
-
-document.getElementById("send-button").addEventListener("click", sendMessage);
-
+// received new chat message
 socket.on("chat message", (msg) =>{
 
     const messageUser = msg.username;
@@ -63,13 +57,113 @@ socket.on("chat message", (msg) =>{
     messagesDiv.appendChild(newMessageContainer);
 
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
 });
 
+/* -------------------  event listeners ----------------------------------*/
+
+// enter button listener
 messageInput.addEventListener('keydown', (event)=>{
     if(event.key === "Enter"){
         sendMessage();
     }
 });
+
+// send button listener
+document.getElementById("send-button").addEventListener("click", sendMessage);
+
+// slash command listener
+// messageInput.addEventListener('input', handleInputChange);
+
+
+/* ------------------------  util functions --------------------------------*/
+
+// common fn to execute when sending message
+function sendMessage(){
+    let message = messageInput.value;
+    if(message.trim() !== ""){
+        const isCommand = handleCommand(message.trim())
+        if(!isCommand){
+            message = replaceWithEmojis(message);
+            socket.emit("chat message", message);
+        }
+        messageInput.value = "";
+    }
+};
+
+function replaceWithEmojis(message){
+    const emojiMap = {
+        react: "⚛️",
+        woah: "😲",
+        hey: "👋",
+        lol: "😂",
+        like: "🤍",
+        congratulations: "🎉",
+    };
+    const regex = new RegExp(`\\b(${Object.keys(emojiMap).join('|')})\\b`, 'gi');
+    const replacedString = message.replace(regex, match => emojiMap[match.toLowerCase()]);
+    console.log(replacedString);
+    return replacedString;
+}
+
+function handleCommand(inputValue) {
+
+    if (inputValue.startsWith("/")) {
+        const commandAndArgs = inputValue.slice(1).trim().split(" ");
+        const command = commandAndArgs[0];
+
+        switch (command) {
+            case "help":
+                prompt("Available commands:\n/help - Show available commands\n/random - Generate a random number\n/clear - Clear the chat.");
+                break;
+            case "random":
+                const ran = generateRandomNumber();
+                displayCommandMessage(`Here's your random number : ${ran}`)
+                break;
+            case "clear":
+                clearChat();
+                break;
+            default:
+                prompt("Unknown command. Type /help for available commands.");
+        }
+
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function displayCommandMessage(message){
+    const messageType = "-received";
+
+    const newMessageContainer = document.createElement("div");
+    newMessageContainer.className = "message-container"+messageType;
+    
+    const avatarDiv = document.createElement("div");
+    avatarDiv.className = "message-avatar";
+    avatarDiv.textContent = "S";
+    newMessageContainer.appendChild(avatarDiv);
+    
+    const newMessageDiv = document.createElement("div");
+    newMessageDiv.className = "message"+messageType;
+    newMessageDiv.textContent = `${message}`;
+
+    newMessageContainer.appendChild(newMessageDiv);
+    messagesDiv.appendChild(newMessageContainer);
+
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function generateRandomNumber() {
+    return Math.floor(Math.random() * 100) + 1;
+}
+
+function clearChat() {
+    messagesDiv.innerHTML = "";
+}
+
+
+
 
 
 
