@@ -4,6 +4,8 @@ const messageInput = document.getElementById("message-input");
 const contactsList = document.querySelector(".contacts-list");
 const messagesDiv = document.querySelector(".messages");
 
+let storedValues = {};
+
 // username prompt
 let username;
 do{
@@ -118,8 +120,8 @@ function replaceWithEmojis(message){
 function handleCommand(inputValue) {
 
     if (inputValue.startsWith("/")) {
-        const commandAndArgs = inputValue.slice(1).trim().split(" ");
-        const command = commandAndArgs[0];
+        const parts = inputValue.slice(1).trim().split(" ");
+        const command = parts[0];
 
         switch (command) {
             case "help":
@@ -132,8 +134,14 @@ function handleCommand(inputValue) {
             case "clear":
                 clearChat();
                 break;
+            case "rem":
+                handleRemCommand(parts);
+                break;
+            case "calc":
+                handleCalcCommand(parts);
+                break;
             default:
-                prompt("Unknown command. Type /help for available commands.");
+                displayCommandMessage("Unknown command. Type /help for available commands.");
         }
 
         return true;
@@ -169,4 +177,37 @@ function generateRandomNumber() {
 
 function clearChat() {
     messagesDiv.innerHTML = "";
+}
+
+function handleRemCommand(parts) {
+    if (parts.length === 2) {
+        const name = parts[1];
+        const storedValue = storedValues[name];
+        if (storedValue !== undefined) {
+            displayCommandMessage(`${name}: ${storedValue}`);
+        } else {
+            displayCommandMessage(`No value stored for ${name}.`);
+        }
+    } else if (parts.length >= 3) {
+        const name = parts[1];
+        const value = parts.slice(2).join(" ");
+        storedValues[name] = value;
+        displayCommandMessage(`Stored value "${value}" with name "${name}".`);
+    } else {
+        displayCommandMessage("Invalid /rem command. Usage: /rem <name> <value>");
+    }
+}
+
+
+function handleCalcCommand(parts) {
+    if (parts.length === 2) {
+        try {
+            const result = eval(parts[1]);
+            displayCommandMessage(`Calculation result: ${result}`);
+        } catch (error) {
+            displayCommandMessage("Error performing calculation.");
+        }
+    } else {
+        displayCommandMessage("Invalid /calc command. Usage: /calc <expression>");
+    }
 }
