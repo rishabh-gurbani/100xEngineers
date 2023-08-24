@@ -9,10 +9,15 @@ let onlineUsers = [];
 
 app.use(express.static(__dirname + '/public'));
 
+function capitalizeFirstLetter(str) {
+  str = str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 io.on('connection', (socket) => {
   console.log('A user connected');
 
   socket.on('user joined', (username) => {
+    capitalizeFirstLetter(username);
     if(!onlineUsers.includes(username)){
       onlineUsers.push(username);
       socket.username = username;

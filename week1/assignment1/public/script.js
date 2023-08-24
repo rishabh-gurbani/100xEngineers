@@ -30,6 +30,7 @@ socket.on("update userList", (users) => {
 
 function sendMessage(){
     const message = messageInput.value;
+    console.log(message);
     if(message.trim() !== ""){
         socket.emit("chat message", message);
         messageInput.value = "";
@@ -39,10 +40,28 @@ function sendMessage(){
 document.getElementById("send-button").addEventListener("click", sendMessage);
 
 socket.on("chat message", (msg) =>{
+
+    const messageUser = msg.username;
+    const message = msg.message;
+    const messageType = messageUser === username ? "-sent" : "-received";
+
+    const newMessageContainer = document.createElement("div");
+    newMessageContainer.className = "message-container"+messageType;
+    
+    if(messageType === "-received"){
+        const avatarDiv = document.createElement("div");
+        avatarDiv.className = "message-avatar";
+        avatarDiv.textContent = messageUser[0].toUpperCase();
+        newMessageContainer.appendChild(avatarDiv);
+    }
+    
     const newMessageDiv = document.createElement("div");
-    newMessageDiv.className = "message received";
-    newMessageDiv.textContent = `${msg.username} : ${msg.message}`;
-    messagesDiv.appendChild(newMessageDiv);
+    newMessageDiv.className = "message"+messageType;
+    newMessageDiv.textContent = `${message}`;
+
+    newMessageContainer.appendChild(newMessageDiv);
+    messagesDiv.appendChild(newMessageContainer);
+
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
 
