@@ -41,18 +41,27 @@ socket.on("chat message", (msg) =>{
 
     const newMessageContainer = document.createElement("div");
     newMessageContainer.className = "message-container"+messageType;
+
+    const newMessageDiv = document.createElement("div");
+    newMessageDiv.className = "message"+messageType;
     
     if(messageType === "-received"){
         const avatarDiv = document.createElement("div");
         avatarDiv.className = "message-avatar";
         avatarDiv.textContent = messageUser[0].toUpperCase();
         newMessageContainer.appendChild(avatarDiv);
-    }
-    
-    const newMessageDiv = document.createElement("div");
-    newMessageDiv.className = "message"+messageType;
-    newMessageDiv.textContent = `${message}`;
 
+        const newMessageUser = document.createElement("div");
+        newMessageUser.className = "message-user";
+        newMessageUser.textContent = messageUser;
+        newMessageDiv.appendChild(newMessageUser);
+    }
+
+    const newMessage = document.createElement("div");
+    newMessage.className = "message";
+    newMessage.textContent = message;
+    newMessageDiv.appendChild(newMessage);
+    
     newMessageContainer.appendChild(newMessageDiv);
     messagesDiv.appendChild(newMessageContainer);
 
@@ -161,9 +170,3 @@ function generateRandomNumber() {
 function clearChat() {
     messagesDiv.innerHTML = "";
 }
-
-
-
-
-
-
