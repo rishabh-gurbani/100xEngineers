@@ -11,6 +11,7 @@ let username;
 do{
     username = prompt("Please enter your username:");
 } while(!username)
+username = capitalizeFirstLetter(username);
 
 socket.emit("user joined", username);
 
@@ -42,6 +43,31 @@ socket.on("chat message", (msg) =>{
     displayMessage(messageUser, message, messageType);
 });
 
+
+socket.on("typing users", (users) => {
+    console.log(users);
+    users = users.filter((user) => user.toLowerCase() !== username.toLowerCase());
+    const typingUsersSection = document.querySelector(".typing-users");
+    const typingIndicator = typingUsersSection.querySelector(".typing-indicator");
+    const typingText = typingUsersSection.querySelector(".typing-text");
+
+    if (users.length === 0) {
+        typingUsersSection.style.display = "none";
+        typingIndicator.style.display = "none";
+        typingText.textContent = "";
+    } else if (users.length < 3) {
+        typingUsersSection.style.display = "flex";
+        typingIndicator.style.display = "block";
+        typingText.textContent =
+        users.length === 1 ? users[0] + " is typing" : users.join(", ") + " are typing";
+    } else {
+        typingUsersSection.style.display = "flex";
+        typingIndicator.style.display = "block";
+        typingText.textContent = "Multiple users are typing";
+    }
+});
+  
+
 /* -------------------  event listeners ----------------------------------*/
 
 // enter button listener
@@ -56,6 +82,29 @@ document.getElementById("send-button").addEventListener("click", sendMessage);
 
 // slash command listener
 // messageInput.addEventListener('input', handleInputChange);
+
+// typing indicators
+let typingTimeout;
+
+messageInput.addEventListener('input', () => {
+  clearTimeout(typingTimeout);
+
+  if (messageInput.value) {
+    if (!typingTimeout) {
+      socket.emit('typing');
+    }
+    typingTimeout = setTimeout(() => {
+      socket.emit('stoppedTyping');
+      typingTimeout = null;
+    }, 700); // Delay of 500 milliseconds
+  } else {
+    if (typingTimeout) {
+      socket.emit('stoppedTyping');
+      typingTimeout = null;
+    }
+  }
+});
+
 
 
 /* ------------------------  util functions --------------------------------*/
@@ -195,3 +244,9 @@ function handleCalcCommand(parts) {
         displayCommandMessage("Invalid /calc command. Usage: /calc <expression>");
     }
 }
+
+
+function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  

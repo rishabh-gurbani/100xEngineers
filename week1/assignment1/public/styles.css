@@ -166,3 +166,57 @@ body, h1, h2, h3, h4, h5, h6, p, ul, li {
 #send-button:hover {
   background: linear-gradient(to right, #FF8C00, #FFA500);
 }
+
+
+.typing-users {
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+}
+
+.typing-indicator {
+  width: 7px;
+  height: 7px;
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+  margin-right: 5px;
+}
+
+.typing-text{
+  font-size: small;
+  font-style: italic;
+}
+
+.typing-indicators {
+  display: flex;
+  margin-left:15px;
+  margin-right: 10px;
+}
+
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.typing-indicator:nth-child(1) {
+  animation: pulse 1s infinite 0.2s; /* Delay the animation by 0.2 seconds */
+}
+
+.typing-indicator:nth-child(2) {
+  animation: pulse 1s infinite 0.4s; /* Delay the animation by 0.4 seconds */
+}
+
+.typing-indicator:nth-child(3) {
+  animation: pulse 1s infinite 0.6s; /* Delay the animation by 0.6 seconds */
+}
+
+
