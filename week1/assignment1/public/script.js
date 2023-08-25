@@ -3,6 +3,15 @@ const socket = io();
 const messageInput = document.getElementById("message-input");
 const contactsList = document.querySelector(".contacts-list");
 const messagesDiv = document.querySelector(".messages");
+const commands = ["help", "random", "clear", "rem", "calc"];
+const commandSuggestionsContainer = document.querySelector(".floating-commands-container");
+const commandsList = {
+    "help" : "Show available commands", 
+    "random" : "Generate a random number",
+    "clear" : "Clear the chat",
+    "rem" : "Remember and recollect key values",
+    "calc" : "Evaluate math expression"
+}
 
 let storedValues = {};
 
@@ -51,7 +60,6 @@ socket.on("chat message", (msg) =>{
 
 
 socket.on("typing users", (users) => {
-    console.log(users);
     users = users.filter((user) => user.toLowerCase() !== username.toLowerCase());
     const typingUsersSection = document.querySelector(".typing-users");
     const typingIndicator = typingUsersSection.querySelector(".typing-indicator");
@@ -87,7 +95,32 @@ messageInput.addEventListener('keydown', (event)=>{
 document.getElementById("send-button").addEventListener("click", sendMessage);
 
 // slash command listener
-// messageInput.addEventListener('input', handleInputChange);
+messageInput.addEventListener("input", () => {
+  const inputValue = messageInput.value.trim();
+  commandSuggestionsContainer.innerHTML = "";
+
+  if (inputValue.startsWith("/")) {
+    const typedCommand = inputValue.slice(1);
+    
+    if (!typedCommand) {
+      // Show all commands if input is just "/"
+      console.log("showAll");
+      showCommandsSuggestions(commands);
+      commandSuggestionsContainer.style.display = "flex";
+    } else {
+        const matchedCommands = commands.filter(command => command.startsWith(typedCommand));
+        if(matchedCommands.length!==0){
+            showCommandsSuggestions(matchedCommands);
+            commandSuggestionsContainer.style.display = "flex";
+        }else{
+            commandSuggestionsContainer.style.display = "none";
+        }
+    }
+  } else {
+    commandSuggestionsContainer.style.display = "none";
+  }
+});
+
 
 // typing indicators
 let typingTimeout;
@@ -117,6 +150,7 @@ messageInput.addEventListener('input', () => {
 
 // common fn to execute when sending message
 function sendMessage(){
+    commandSuggestionsContainer.style.display="none";
     let message = messageInput.value;
     if(message.trim() !== ""){
         const isCommand = handleCommand(message.trim())
@@ -139,7 +173,6 @@ function replaceWithEmojis(message){
     };
     const regex = new RegExp(`\\b(${Object.keys(emojiMap).join('|')})\\b`, 'gi');
     const replacedString = message.replace(regex, match => emojiMap[match.toLowerCase()]);
-    console.log(replacedString);
     return replacedString;
 }
 
@@ -151,7 +184,7 @@ function handleCommand(inputValue) {
 
         switch (command) {
             case "help":
-                prompt("Available commands:\n/help - Show available commands\n/random - Generate a random number\n/clear - Clear the chat.");
+                prompt("Available commands:\n/help - Show available commands\n/random - Generate a random number\n/rem - Remember and recollect key values\n/calc - Evaluate math expression\n/clear - Clear the chat.");
                 break;
             case "random":
                 const ran = generateRandomNumber();
@@ -216,7 +249,12 @@ function generateRandomNumber() {
 }
 
 function clearChat() {
-    messagesDiv.innerHTML = "";
+    const divs = messagesDiv.querySelectorAll('div');
+    
+    divs.forEach((div) => {
+      if (!div.classList.contains('floating-commands-container')) {
+        div.remove();
+      }});
 }
 
 function handleRemCommand(parts) {
@@ -251,8 +289,27 @@ function handleCalcCommand(parts) {
     }
 }
 
-
 function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+}
+
+function showCommandsSuggestions(commands) {
+    console.log("show");
+    commands.forEach(command => {
+        const suggestionItem = document.createElement("div");
+
+        const commandDef = document.createElement("div");
+        commandDef.textContent = `/${command}`;
+        commandDef.classList.add("command-definition");
+
+        const commandPrompt = document.createElement("div");
+        commandPrompt.textContent = commandsList[command];
+        commandPrompt.classList.add("command-prompt");
+
+        suggestionItem.classList.add("command-block");
+        suggestionItem.appendChild(commandDef);
+        suggestionItem.appendChild(commandPrompt);
+        commandSuggestionsContainer.appendChild(suggestionItem);
+    });
+}
   

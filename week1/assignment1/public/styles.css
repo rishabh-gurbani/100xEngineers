@@ -73,6 +73,7 @@ body, h1, h2, h3, h4, h5, h6, p, ul, li {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+  position: relative;
 }
 
 .message-container-sent, .message-container-received {
@@ -224,4 +225,44 @@ body, h1, h2, h3, h4, h5, h6, p, ul, li {
   animation: pulse 1s infinite 0.6s; /* Delay the animation by 0.6 seconds */
 }
 
+.floating-commands-container {
+  position: absolute;
+  bottom: 20px; /* Adjust this value as needed */
+  left: 20px; /* Adjust this value as needed */
+  right: 20px; /* Adjust this value as needed */
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+}
 
+.command-block {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+}
+
+.command-block:hover {
+  background-color: rgba(200, 200, 200, 0.8); /* Greyer background on hover */
+}
+
+.command-definition {
+  font-size: small;;
+  background: linear-gradient(to right, #FFA500, #FF8C00);
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 8px;
+  display: inline-block;
+  margin-right: 10px; 
+}
+
+.command-prompt {
+  font-size: small;
+  font-style: italic;
+}
