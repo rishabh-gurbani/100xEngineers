@@ -21,6 +21,12 @@ socket.emit("user joined", username);
 socket.on("update userList", (users) => {
     contactsList.innerHTML = "";
 
+    const activeUsersCountDiv = document.querySelector(".active-users");
+    if(users.length>0){
+        const userVerb = users.length > 1 ? "users" : "user";
+        activeUsersCountDiv.textContent = `${users.length} active ${userVerb}`;
+    }
+
     users.forEach((user) => {
         const contactItem = document.createElement("li");
         contactItem.className = "contact";
