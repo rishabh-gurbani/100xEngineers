@@ -1,3 +1,4 @@
 [submodule "week1/100xChatApp"]
 	path = week1/100xChatApp
 	url = https://github.com/rishabh-gurbani/100xChatApp.git
+	name = 100xChatApp
