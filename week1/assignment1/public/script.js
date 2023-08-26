@@ -160,7 +160,7 @@ function sendMessage(){
         }
         messageInput.value = "";
     }
-};
+}
 
 function replaceWithEmojis(message){
     const emojiMap = {
